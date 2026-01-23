@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Browser Game</title>
+    <link rel="icon" href="data:,">
+    
+    <!-- CSS Modules -->
+    <link rel="stylesheet" href="ui/css/core.css">
+    <link rel="stylesheet" href="ui/css/hud.css">
+    <link rel="stylesheet" href="ui/css/menus.css">
+    <link rel="stylesheet" href="ui/css/settings.css">
+    <link rel="stylesheet" href="ui/css/lobby.css">
+    <link rel="stylesheet" href="ui/css/loadout.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Teko:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; }
+        #loading-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; color: #fff; display: flex; justify-content: center; align-items: center; 
+            z-index: 9999; font-family: 'Teko', sans-serif; font-size: 32px; letter-spacing: 2px;
+            transition: opacity 0.5s; pointer-events: none; 
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">LOADING...</div>
+
+    <!-- Canvases -->
+    <canvas id="game-canvas"></canvas>
+    <canvas id="menu-canvas"></canvas>
+
+    <!-- PHYSICS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+
+    <!-- THREE.JS IMPORT MAP (Modern) -->
+    <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+        "three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.3/build/index.module.js"
+      }
+    }
+    </script>
+    
+    <!-- CORE LIBS LOADER -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+        import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+        import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+        
+        // BVH
+        import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from 'three-mesh-bvh';
+        import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+
+        // Apply Patches
+        THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
+        THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
+        THREE.Mesh.prototype.raycast = acceleratedRaycast;
+
+        // Expose Globals
+        window.THREE = THREE;
+        window.EffectComposer = EffectComposer;
+        window.RenderPass = RenderPass;
+        window.ShaderPass = ShaderPass;
+        window.UnrealBloomPass = UnrealBloomPass;
+        window.OutputPass = OutputPass;
+        window.BokehPass = BokehPass;
+        window.SSAOPass = SSAOPass;
+        window.BufferGeometryUtils = BufferGeometryUtils;
+        
+        // Signal Ready
+        window.CORE_LIBS_LOADED = true;
+        console.log("Libs: THREE.js & Addons Loaded");
+    </script>
+
+    <!-- FIREBASE COMPAT LIBRARIES (Standard Script Tags) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <!-- GAME SCRIPTS -->
+    <script src="ui/ui_elements.js"></script>
+    <script src="core/input_manager.js"></script>
+    <script src="core/audio_manager.js"></script>
+    <script src="core/asset_loader.js"></script>
+    <script src="player/inventory_controller.js"></script>
+    
+    <!-- Scene & Render -->
+    <script src="core/scene_controller.js"></script>
+    <script src="core/map_optimizer.js"></script>
+    <script src="render/material_library.js"></script>
+    <script src="render/shader/custom_shaders.js"></script>
+    <script src="render/shader/post_effects_library.js"></script>
+    <script src="render/shader/shadow_manager.js"></script>
+    <script src="render/shader/raytracer.js"></script>
+    <script src="render/shader/sky_renderer.js"></script>
+    <script src="render/shader/post_processor.js"></script>
+    <script src="visuals/menu_renderer.js"></script>
+    <script src="render/gun_animator.js"></script>
+    <script src="render/gun_renderer.js"></script>
+    
+    <!-- Data -->
+    <script src="data/game_data.js"></script>
+    <script src="data/common_parts.js"></script>
+    <script src="data/effects/particles.js"></script>
+    <script src="visuals/vfx_config.js"></script>
+    
+    <!-- Systems -->
+    <script src="core/stat_system.js"></script>
+    <script src="core/loadout_manager.js"></script>
+    <script src="ui/menus/loadout_stats.js"></script>
+    <script src="ui/menus/loadout_ui.js"></script>
+    <script src="ui/scoreboard_manager.js"></script>
+    
+    <!-- Settings Manager Loaded Before UIManager -->
+    <script src="ui/settings_manager.js"></script>
+    <script src="core/ui_manager.js"></script>
+    
+    <!-- Loaders -->
+    <script src="data/weapon_registry.js"></script>
+    <script src="data/throwable_registry.js"></script>
+    <script src="data/map_registry.js"></script>
+    <script src="data/player/player_model.js"></script>
+    
+    <!-- Game Logic -->
+    <script src="gamemodes/team_manager.js"></script>
+    <script src="gamemodes/match_state.js"></script>
+    <script src="player/modules/player_health.js"></script>
+    <script src="player/modules/player_ammo.js"></script>
+    <script src="player/player_state.js"></script>
+    <script src="player/physics_controller.js"></script>
+    <script src="player/character_controller.js"></script>
+    <script src="player/player_camera.js"></script>
+    <script src="player/death_camera_controller.js"></script>
+    
+    <!-- Visuals -->
+    <script src="visuals/particle_manager.js"></script>
+    <script src="visuals/ragdoll_manager.js"></script>
+    
+    <!-- Weapons -->
+    <script src="weapons/ballistics.js"></script>
+    <script src="weapons/weapon_manager.js"></script>
+    <script src="weapons/throwable_manager.js"></script>
+    
+    <!-- UI Modules -->
+    <script src="ui/hud/basic_hud.js"></script>
+    <script src="ui/hud/shotgun_hud.js"></script>
+    <script src="ui/hud/rifle_hud.js"></script>
+    <script src="ui/hud/right_side_hud.js"></script>
+    <script src="ui/hud/hud_manager.js"></script>
+    <script src="ui/tactical_map/tactical_camera.js"></script>
+    <script src="ui/prematch/lobby_settings.js"></script>
+    <script src="ui/prematch/team_selector.js"></script>
+    <script src="ui/prematch/launch_control.js"></script>
+    <script src="ui/prematch/lobby_ui.js"></script>
+    <script src="ui/nametag_system.js"></script>
+    <script src="ui/hitmarker_system.js"></script>
+    <script src="ui/damage_indicator.js"></script>
+    <script src="ui/deployment_screen.js"></script>
+    <script src="ui/killfeed.js"></script>
+    
+    <!-- Multiplayer -->
+    <script src="multiplayer/firebase_manager.js"></script> <!-- Now a standard script -->
+    <script src="multiplayer/network_state.js"></script>
+    <script src="multiplayer/remote_player_animator.js"></script>
+    <script src="multiplayer/remote_player_visuals.js"></script>
+    <script src="multiplayer/remote_player.js"></script>
+    <script src="multiplayer/remote_player_manager.js"></script>
+    <script src="multiplayer/multiplayer_ui.js"></script>
+    <script src="multiplayer/playroom_manager.js"></script>
+    
+    <!-- Main -->
+    <script src="data/map_assets.js"></script>
+    <script src="core/game_manager.js"></script>
+
+    <script>
+        // STRICT INIT SEQUENCE
+        function attemptStart() {
+            // 1. Check Libraries
+            if (!window.CORE_LIBS_LOADED || !window.THREE || !window.EffectComposer || !window.BufferGeometryUtils) {
+                setTimeout(attemptStart, 100);
+                return;
+            }
+            
+            // 2. Check Game Manager
+            if (!window.TacticalShooter || !window.TacticalShooter.GameManager) {
+                setTimeout(attemptStart, 100);
+                return;
+            }
+            
+            // 3. Start
+            console.log("Boot: Starting Game Manager...");
+            window.TacticalShooter.GameManager.init();
+            
+            // Hide Loader logic moved to MultiplayerUI to prevent flickering
+        }
+        
+        window.addEventListener('load', attemptStart);
+    </script>
+</body>
+</html>

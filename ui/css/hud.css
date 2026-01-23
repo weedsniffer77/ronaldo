@@ -1,0 +1,212 @@
+
+/* HUD Elements */
+#hud { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
+#ammo-display { position: absolute; bottom: 30px; right: 30px; color: #fff; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); font-family: 'Teko', sans-serif; letter-spacing: 2px; text-align: right; }
+.mag-cap { font-size: 28px; color: #ccc; font-weight: 400; margin-left: 2px; }
+.ammo-reserve { font-size: 18px; color: #666; font-weight: 600; margin-left: 10px; font-family: 'Rajdhani', sans-serif; }
+#player-status { position: absolute; bottom: 30px; left: 30px; width: 300px; }
+#player-name-display { font-family: 'Teko', sans-serif; font-size: 28px; letter-spacing: 1px; color: #ccc; margin-bottom: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); text-transform: uppercase; font-weight: 400; }
+#shotgun-hud { position: absolute; bottom: 30px; right: 30px; text-align: right; }
+#shotgun-counter { font-family: 'Teko', sans-serif; font-size: 32px; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; margin-bottom: 5px; }
+#shotgun-shells { display: flex; flex-direction: row-reverse; gap: 4px; justify-content: flex-end; }
+.shell-icon { width: 12px; height: 30px; background: #333; border: 1px solid #555; border-radius: 2px; }
+.shell-icon.loaded { background: #aa2222; border-color: #ff5555; box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
+.shell-icon.chambered { background: #ffaa00; border-color: #ffeeaa; box-shadow: 0 0 8px rgba(255, 170, 0, 0.8); }
+
+/* RIFLE ROUND STYLING */
+.shell-icon.rifle-icon {
+    width: 8px; /* Thinner */
+    height: 35px; /* Longer */
+    border-radius: 2px 2px 50% 50% / 2px 2px 10px 10px; /* Bullet tip shape at bottom (rotated visually or just symbolic) */
+    /* Let's make it look like a bullet pointing UP */
+    border-radius: 50% 50% 2px 2px / 10px 10px 2px 2px; 
+}
+.shell-icon.rifle-icon.loaded {
+    background: #d4af37; /* Brass */
+    border-color: #f0e68c;
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+}
+.shell-icon.rifle-icon.chambered {
+    background: #fff; /* Bright white/hot */
+    border-color: #fff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+#health-track { width: 100%; height: 10px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); position: relative; clip-path: polygon(0 0, 100% 0, 97% 100%, 0 100%); }
+#health-fill { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; transition: width 0.1s linear, background-color 0.5s ease; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); z-index: 2; }
+#health-damage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #aaaaaa; z-index: 1; transition: width 0.1s linear; }
+.health-segment { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(0, 0, 0, 0.8); z-index: 3; }
+#fps-display { display: none; position: fixed; bottom: 5px; right: 5px; color: #0f0; font-size: 12px; font-family: 'Rajdhani', sans-serif; font-weight: 400; z-index: 6000; pointer-events: none; opacity: 0.5; }
+
+/* ROOM CODE: Tighter corner positioning */
+#room-code-display { 
+    position: fixed; 
+    top: 4px; 
+    left: 4px; 
+    background: rgba(0,0,0,0.6); 
+    border-bottom: 2px solid #fff; 
+    padding: 2px 8px; 
+    z-index: 6000; /* Ensured High Z-Index */
+    display: none; 
+    align-items: center; 
+    gap: 6px; 
+    pointer-events: none;
+    transition: left 0.5s ease;
+}
+
+/* ROOM CODE: Lobby Position (Shifted Right to avoid Settings) */
+body.lobby-active #room-code-display {
+    left: 120px;
+}
+
+.code-label { color: #aaa; font-size: 12px; font-weight: bold; }
+.code-value { color: #fff; font-size: 18px; letter-spacing: 2px; font-family: 'Teko', sans-serif; }
+#notification-area { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 10000; pointer-events: none; }
+.notification-toast { background: rgba(10, 15, 20, 0.9); border: 1px solid #333; color: #fff; padding: 10px 25px; min-width: 300px; position: relative; border-left: 4px solid #fff; box-shadow: 0 0 30px rgba(0,0,0,0.5); font-family: 'Rajdhani', sans-serif; font-size: 16px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; animation: slideIn 0.3s ease-out forwards; pointer-events: auto; backdrop-filter: blur(4px); }
+.notification-toast.blue { border-left-color: var(--team-alpha); }
+.notification-toast.red { border-left-color: var(--team-bravo); }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+#killfeed-container { position: fixed; top: 10px; right: 10px; width: 350px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; z-index: 15; align-items: flex-end; }
+.killfeed-entry { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.7)); padding: 4px 10px; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 14px; text-transform: uppercase; font-weight: 600; text-shadow: 1px 1px 2px #000; animation: kfSlideIn 0.2s ease-out forwards; display: flex; align-items: center; border-right: 3px solid transparent; }
+.killfeed-entry.kf-blue { border-right-color: #0088ff; color: #ddeeff; }
+.killfeed-entry.kf-red { border-right-color: #ff4444; color: #ffddee; }
+.killfeed-entry.kf-gold { border-right-color: #ffd700; color: #fff8cc; font-weight: 700; }
+.kf-killer { font-weight: 700; }
+.kf-victim { font-weight: 700; opacity: 0.9; }
+@keyframes kfSlideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes kfFadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+#crosshair { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10; display: none; }
+.crosshair-line { position: absolute; background: rgba(255, 255, 255, 0.8); }
+.crosshair-h { width: 12px; height: 2px; top: -1px; left: -6px; }
+.crosshair-v { width: 2px; height: 12px; top: -6px; left: -1px; }
+#damage-indicator-container { position: fixed; top: 50%; left: 50%; width: 0; height: 0; overflow: visible; pointer-events: none; z-index: 12; /* Increased Z-Index above HUD */ }
+
+/* STANDARD INDICATOR: Sharp directional wedge */
+.damage-indicator { 
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 40px; 
+    transform-origin: 50% 100%; 
+    pointer-events: none; 
+    background: linear-gradient(to top, rgba(200, 0, 0, 0.8) 0%, rgba(200, 0, 0, 0) 100%); 
+    clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%); 
+}
+
+/* STEALTH INDICATOR: Wide, blurred, non-directional visual cue */
+.damage-indicator.stealth {
+    width: 250px !important; /* Wider */
+    height: 100px !important;
+    background: linear-gradient(to top, rgba(180, 0, 0, 0.5) 0%, rgba(180, 0, 0, 0) 100%) !important;
+    clip-path: none !important; /* Remove wedge shape */
+    border-radius: 125px 125px 0 0 !important; /* Semi-circle fan */
+    filter: blur(12px) !important; /* Heavy blur to indicate confusion */
+}
+
+#instructions { position: fixed; top: 100px; left: 20px; color: #ddd; font-size: 16px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; line-height: 1.4; z-index: 10; display: none; font-family: 'Rajdhani', sans-serif; }
+
+#scoreboard { display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 700px; background: rgba(10, 15, 20, 0.95); border: 1px solid #444; z-index: 5000; backdrop-filter: blur(10px); box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+#scoreboard.active { display: block; }
+.scoreboard-info { background: rgba(30,30,30,0.8); padding: 10px 20px; border-bottom: 2px solid #555; text-align: center; }
+#sb-mode { font-family: 'Teko', sans-serif; font-size: 28px; letter-spacing: 2px; color: #fff; line-height: 1; }
+#sb-map { font-family: 'Rajdhani', sans-serif; font-size: 14px; color: #888; text-transform: uppercase; margin-top: 2px; }
+#sb-timer { font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 22px; color: #00CCFF; margin: 2px 0; font-variant-numeric: tabular-nums; }
+#sb-status-container { height: 10px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sb-row { display: grid; grid-template-columns: minmax(200px, 1fr) 80px 80px 80px 80px; padding: 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-family: 'Rajdhani', sans-serif; font-size: 16px; align-items: stretch; position: relative; border-left: 4px solid transparent; min-height: 35px; }
+.sb-row.header { color: #888; font-size: 12px; text-transform: uppercase; background: rgba(0,0,0,0.5); border-left: 4px solid transparent; font-weight: bold; }
+.sb-cell { display: flex; align-items: center; justify-content: center; padding: 5px 10px; border-right: 1px solid rgba(255,255,255,0.05); }
+.sb-cell:last-child { border-right: none; }
+.sb-cell.name-col { justify-content: flex-start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; padding-left: 15px; }
+.sb-row .sb-cell { color: #888; } 
+.sb-row.local .sb-cell { color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.5); } 
+.sb-row.header .sb-cell { color: #aaa; }
+.sb-row.team-0 { border-left-color: var(--team-alpha); } 
+.sb-row.team-1 { border-left-color: var(--team-bravo); }
+.sb-row.team-2 { border-left-color: var(--team-charlie); } 
+.sb-row.team-3 { border-left-color: var(--team-delta); }
+
+/* Dead Player Style in Scoreboard */
+.sb-row.dead { background: rgba(0,0,0,0.8); opacity: 0.6; }
+.sb-row.dead .sb-cell { color: #666; }
+
+.sb-divider { height: 8px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+#game-timer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); font-family: 'Rajdhani', sans-serif; font-weight: 500; font-size: 32px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 100; pointer-events: none; letter-spacing: 2px; font-variant-numeric: tabular-nums; display: none; }
+
+#pre-round-timer {
+    position: fixed;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Teko', sans-serif;
+    font-size: 120px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(0,0,0,0.5);
+    z-index: 8000;
+    pointer-events: none;
+    display: none;
+    line-height: 1;
+}
+
+#hitmarker-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; }
+.hitmarker { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; transform: translate(-50%, -50%); opacity: 0; }
+.hm-line { position: absolute; background: #fff; border-radius: 2px; }
+.hitmarker.white .hm-line { background: #fff; box-shadow: 0 0 4px rgba(255,255,255,0.5); }
+.hitmarker.gold .hm-line { background: #ffd700; box-shadow: 0 0 5px rgba(255,215,0,0.8); }
+.hitmarker.red .hm-line { background: #ff3333; box-shadow: 0 0 5px rgba(255,0,0,0.8); }
+.hitmarker.gold, .hitmarker.red { width: 60px; height: 60px; }
+.hm-line-1 { width: 12px; height: 2px; top: 50%; left: 50%; transform-origin: 0 50%; transform: rotate(45deg) translate(4px, 0); }
+.hm-line-2 { width: 12px; height: 2px; top: 50%; left: 50%; transform-origin: 0 50%; transform: rotate(135deg) translate(4px, 0); }
+.hm-line-3 { width: 12px; height: 2px; top: 50%; left: 50%; transform-origin: 0 50%; transform: rotate(225deg) translate(4px, 0); }
+.hm-line-4 { width: 12px; height: 2px; top: 50%; left: 50%; transform-origin: 0 50%; transform: rotate(315deg) translate(4px, 0); }
+.hitmarker.gold .hm-line, .hitmarker.red .hm-line { width: 16px; transform: rotate(var(--rot)) translate(6px, 0); }
+.hitmarker.gold .hm-line-1 { --rot: 45deg; transform: rotate(45deg) translate(6px, 0); }
+.hitmarker.gold .hm-line-2 { --rot: 135deg; transform: rotate(135deg) translate(6px, 0); }
+.hitmarker.gold .hm-line-3 { --rot: 225deg; transform: rotate(225deg) translate(6px, 0); }
+.hitmarker.gold .hm-line-4 { --rot: 315deg; transform: rotate(315deg) translate(6px, 0); }
+.hitmarker.red .hm-line-1 { transform: rotate(45deg) translate(6px, 0); }
+.hitmarker.red .hm-line-2 { transform: rotate(135deg) translate(6px, 0); }
+.hitmarker.red .hm-line-3 { transform: rotate(225deg) translate(6px, 0); }
+.hitmarker.red .hm-line-4 { transform: rotate(315deg) translate(6px, 0); }
+@keyframes hitPop { 0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; } 20% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.0); opacity: 0; } }
+@keyframes hitPopLong { 0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; } 10% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; } 60% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.0); opacity: 0; } }
+.hitmarker.animate { animation: hitPop 0.3s ease-out forwards; }
+.hitmarker.animate-long { animation: hitPopLong 0.6s ease-out forwards; }
+
+/* IN GAME LOADOUT PICKER */
+#ingame-loadout-picker { 
+    display: none; 
+    position: absolute;
+    bottom: 30px; 
+    left: 30px;
+    width: 600px; 
+    padding: 10px; 
+    background: rgba(0,0,0,0.2); 
+    border: 1px solid #444; 
+    backdrop-filter: blur(4px); 
+    pointer-events: auto; 
+    opacity: 1;
+    transition: opacity 0.5s ease-out; 
+}
+#ingame-loadout-picker.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ilp-header { display: none; }
+.ilp-slot { 
+    display: flex; 
+    align-items: center; 
+    background: rgba(0,0,0,0.4); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    padding: 5px 10px; 
+    margin-bottom: 2px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    height: 40px;
+}
+.ilp-slot:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+.ilp-slot.active { border-left: 3px solid var(--accent); background: rgba(255,255,255,0.15); }
+.ilp-num { font-family: 'Teko', sans-serif; font-size: 24px; font-weight: 300; color: #888; width: 30px; }
+.ilp-content { display: flex; align-items: center; gap: 8px; font-family: 'Rajdhani', sans-serif; font-size: 14px; color: #ddd; text-transform: uppercase; }
+.ilp-wep { color: #fff; font-weight: 600; }
+.ilp-sep { color: #555; font-weight: 300; }
